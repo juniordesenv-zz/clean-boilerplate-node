@@ -52,12 +52,16 @@
     "typescript": "^3.7.5"
   },
   "dependencies": {
+    "@types/handlebars": "^4.1.0",
+    "@types/nodemailer": "^6.4.0",
     "bcrypt": "^3.0.7",
     "express": "^4.17.1",
     "faker": "^4.1.0",
+    "handlebars": "^4.7.6",
     "jsonwebtoken": "^8.5.1",
     "module-alias": "^2.2.2",
     "mongodb": "^3.5.2",
+    "nodemailer": "^6.4.8",
     "nodemon": "^2.0.4",
     "swagger-ui-express": "^4.1.4",
     "typescript-rest-swagger": "^1.1.1",
