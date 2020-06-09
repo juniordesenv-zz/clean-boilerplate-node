@@ -15,7 +15,7 @@ module.exports = {
         'files': [ '*.spec.ts' ],
         'rules': {
           'max-classes-per-file': 0,
-          '@typescript-eslint/no-unused-vars': 0,
+          '@typescript-eslint/no-unused-vars': 0
         }
     }]
 };
