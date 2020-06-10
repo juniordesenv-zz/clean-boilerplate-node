@@ -4,6 +4,16 @@ import { NodemailerAdapter } from '@/infra/mailer/nodemailer-adapter/nodemailer-
 import { MailerParams } from '@/data/protocols/mailer/sender-mail';
 import faker from 'faker';
 
+jest.mock('nodemailer', () => ({
+  createTransport() {
+    return {
+      sendMail: jest.fn(() => ({
+        messageId: faker.random.uuid(),
+      })),
+    };
+  },
+}));
+
 const mockMailer = (): MailerParams => ({
   from: 'valid_email@mail.com.br',
   to: 'other_email@mail.com.br',
@@ -20,15 +30,6 @@ const makeSut = (): NodemailerAdapter => new NodemailerAdapter(
   false,
 );
 
-jest.mock('nodemailer', () => ({
-  createTransport() {
-    return {
-      sendMail: jest.fn(() => ({
-        messageId: faker.random.uuid(),
-      })),
-    };
-  },
-}));
 
 describe('Nodemailer Adapter', () => {
   describe('sendMail()', async () => {

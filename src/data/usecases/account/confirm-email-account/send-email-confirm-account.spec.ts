@@ -1,7 +1,18 @@
 import { SendEmailConfirmAccount } from '@/data/usecases/account/confirm-email-account/send-email-confirm-account';
-import { TemplateBuilderSpy } from '@/data/test/mock-template-builder';
-import { SenderMailSpy } from '@/data/test/mock-mailer';
+import { TemplateBuilderSpy, SenderMailSpy } from '@/data/test';
+
 import { mockSendLinkConfirmAccountParams, throwError } from '@/domain/test';
+import faker from 'faker';
+
+jest.mock('nodemailer', () => ({
+  createTransport() {
+    return {
+      sendMail: jest.fn(() => ({
+        messageId: faker.random.uuid(),
+      })),
+    };
+  },
+}));
 
 type SutTypes = {
   sut: SendEmailConfirmAccount,

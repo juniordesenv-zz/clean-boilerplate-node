@@ -4,6 +4,17 @@ import { Collection } from 'mongodb';
 import { hash } from 'bcrypt';
 import app from '@/main/config/app';
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper';
+import faker from 'faker';
+
+jest.mock('nodemailer', () => ({
+  createTransport() {
+    return {
+      sendMail: jest.fn(() => ({
+        messageId: faker.random.uuid(),
+      })),
+    };
+  },
+}));
 
 let accountCollection: Collection;
 
