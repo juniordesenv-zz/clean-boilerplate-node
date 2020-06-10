@@ -1,10 +1,11 @@
 import {
-  badRequest, serverError, unauthorized, ok,
+  badRequest, serverError, unauthorized, ok, forbidden,
 } from '@/presentation/helpers/http/http-helper';
 import {
   Controller, HttpRequest, HttpResponse, Validation,
 } from '@/presentation/protocols';
 import { Authentication } from '@/domain/usecases/account/authentication';
+import { EmailIsNotConfirmedError } from '@/presentation/errors';
 
 export class LoginController implements Controller {
   constructor(
@@ -18,10 +19,13 @@ export class LoginController implements Controller {
       if (error) return badRequest(error);
       const { email, password } = httpRequest.body;
       const authenticationModel = await this.authentication.auth({ email, password });
-      if (!authenticationModel) {
-        return unauthorized();
+      if (authenticationModel) {
+        if (!authenticationModel.confirmedEmail) {
+          return forbidden(new EmailIsNotConfirmedError());
+        }
+        return ok(authenticationModel);
       }
-      return ok(authenticationModel);
+      return unauthorized();
     } catch (error) {
       return serverError(error);
     }

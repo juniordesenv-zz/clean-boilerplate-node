@@ -55,6 +55,7 @@ describe('Authentication Routes', () => {
         name: 'Junior Miranda',
         email: 'jr.miranda@outlook.com',
         password,
+        confirmedEmail: true,
       });
       await request(app)
         .post('/api/login')
@@ -65,6 +66,22 @@ describe('Authentication Routes', () => {
         .expect(200);
     });
 
+
+    test('Should return 403 on login', async () => {
+      const password = await hash('123456', 12);
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password,
+      });
+      await request(app)
+        .post('/api/login')
+        .send({
+          email: 'jr.miranda@outlook.com',
+          password: '123456',
+        })
+        .expect(403);
+    });
 
     test('Should return 401 on login', async () => {
       await request(app)

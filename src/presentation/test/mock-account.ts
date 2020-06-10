@@ -21,9 +21,10 @@ export class AddAccountSpy implements AddAccount {
 export class AuthenticationSpy implements Authentication {
   authenticationParams: AuthenticationParams;
 
-  authenticationModel = {
+  authenticationModel: AuthenticationModel = {
     accessToken: faker.random.uuid(),
     name: faker.name.findName(),
+    confirmedEmail: true,
   };
 
   async auth(authenticationParams: AuthenticationParams): Promise<AuthenticationModel> {

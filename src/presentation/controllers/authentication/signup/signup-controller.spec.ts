@@ -67,6 +67,7 @@ describe('SignUp Controller', () => {
       name: httpRequest.body.name,
       email: httpRequest.body.email,
       password: httpRequest.body.password,
+      confirmedEmail: false,
     });
   });
 

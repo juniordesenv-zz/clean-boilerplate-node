@@ -65,6 +65,7 @@ describe('DbAddAccount Usecase', () => {
       email: addAccountParams.email,
       password: hasherSpy.digest,
       confirmToken: uuidSpy.uuid,
+      confirmedEmail: addAccountParams.confirmedEmail,
     });
   });
 
