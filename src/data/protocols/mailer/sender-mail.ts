@@ -1,6 +1,12 @@
-import { SentMessageInfo as NodemailerMessageInfo } from 'nodemailer';
 
-export type SentMessageInfo = NodemailerMessageInfo;
+export type SentMessageInfo = {
+  messageId: string;
+  envelope: any;
+  accepted: string[];
+  rejected?: string[];
+  pending?: string[];
+  response: string;
+};
 
 export type MailerParams = {
   from: string;

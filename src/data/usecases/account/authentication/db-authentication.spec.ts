@@ -1,4 +1,3 @@
-import { DbAuthentication } from './db-authentication';
 import {
   mockAuthenticationParams, throwError,
 } from '@/domain/test';
@@ -8,6 +7,7 @@ import {
   LoadAccountByEmailRepositorySpy,
   UpdateAccessTokenRepositorySpy,
 } from '@/data/test';
+import { DbAuthentication } from './db-authentication';
 
 
 type SutTypes = {

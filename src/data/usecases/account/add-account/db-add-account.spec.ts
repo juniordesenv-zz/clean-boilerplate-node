@@ -1,13 +1,15 @@
 import { DbAddAccount } from '@/data/usecases/account/add-account/db-add-account';
 import { mockAccountModel, mockAddAccountParams, throwError } from '@/domain/test';
 import { AddAccountRepositorySpy, HasherSpy, LoadAccountByEmailRepositorySpy } from '@/data/test';
+import { UuidSpy } from '@/data/test/mock-uuid';
 
 
 type SutTypes = {
   sut: DbAddAccount,
-  hasherSpy: HasherSpy,
-  addAccountRepositorySpy: AddAccountRepositorySpy
-  loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy,
+  hasherSpy: HasherSpy;
+  addAccountRepositorySpy: AddAccountRepositorySpy;
+  loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy;
+  uuidSpy: UuidSpy;
 };
 
 const makeSut = (): SutTypes => {
@@ -15,12 +17,19 @@ const makeSut = (): SutTypes => {
   loadAccountByEmailRepositorySpy.accountModel = null;
   const hasherSpy = new HasherSpy();
   const addAccountRepositorySpy = new AddAccountRepositorySpy();
-  const sut = new DbAddAccount(hasherSpy, addAccountRepositorySpy, loadAccountByEmailRepositorySpy);
+  const uuidSpy = new UuidSpy();
+  const sut = new DbAddAccount(
+    hasherSpy,
+    addAccountRepositorySpy,
+    loadAccountByEmailRepositorySpy,
+    uuidSpy,
+  );
   return {
     sut,
     hasherSpy,
     addAccountRepositorySpy,
     loadAccountByEmailRepositorySpy,
+    uuidSpy,
   };
 };
 
@@ -42,13 +51,19 @@ describe('DbAddAccount Usecase', () => {
   });
 
   test('Should call AddAccountRepository with correct values', async () => {
-    const { sut, addAccountRepositorySpy, hasherSpy } = makeSut();
+    const {
+      sut,
+      addAccountRepositorySpy,
+      hasherSpy,
+      uuidSpy,
+    } = makeSut();
     const addAccountParams = mockAddAccountParams();
     await sut.add(addAccountParams);
     expect(addAccountRepositorySpy.addAccountParams).toEqual({
       name: addAccountParams.name,
       email: addAccountParams.email,
       password: hasherSpy.digest,
+      confirmToken: uuidSpy.uuid,
     });
   });
 
@@ -78,5 +93,18 @@ describe('DbAddAccount Usecase', () => {
     const addAccountParams = mockAddAccountParams();
     await sut.add(addAccountParams);
     expect(loadAccountByEmailRepositorySpy.email).toBe(addAccountParams.email);
+  });
+
+  test('Should call Uuid v4', async () => {
+    const { sut, uuidSpy } = makeSut();
+    await sut.add(mockAddAccountParams());
+    expect(uuidSpy.callsCount).toBe(1);
+  });
+
+  test('Should throw if Uuid throws', async () => {
+    const { sut, uuidSpy } = makeSut();
+    jest.spyOn(uuidSpy, 'v4').mockImplementationOnce(throwError);
+    const promise = sut.add(mockAddAccountParams());
+    await expect(promise).rejects.toThrow();
   });
 });

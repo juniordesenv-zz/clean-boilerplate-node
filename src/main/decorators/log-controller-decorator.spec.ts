@@ -1,9 +1,9 @@
-import * as faker from 'faker';
-import { LogControllerDecorator } from './log-controller-decorator';
+import faker from 'faker';
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { serverError, ok } from '@/presentation/helpers/http/http-helper';
 import { mockAccountModel } from '@/domain/test';
 import { LogErrorRepositorySpy } from '@/data/test';
+import { LogControllerDecorator } from './log-controller-decorator';
 
 class ControllerSpy implements Controller {
   httpResponse = ok(mockAccountModel());

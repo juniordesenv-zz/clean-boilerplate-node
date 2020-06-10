@@ -1,9 +1,9 @@
-import { TemplateBuild } from '@/data/protocols/template-builder/template-build';
+import { TemplateBuilder } from '@/data/protocols/template-builder/template-build';
 import fs from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
 
-export class HandlebarsAdapter implements TemplateBuild {
+export class HandlebarsAdapter implements TemplateBuilder {
   constructor(
     private readonly templateName: string,
     private readonly dirname: string,
@@ -15,7 +15,7 @@ export class HandlebarsAdapter implements TemplateBuild {
 
   async build(transpileData: object): Promise<string> {
     const html = await this.loadTemplate();
-    const template = handlebars.compile(html);
+    const template = handlebars.compile(html.toString());
     return template(transpileData);
   }
 }

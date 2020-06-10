@@ -1,10 +1,11 @@
 // eslint-disable-next-line max-classes-per-file
-import * as faker from 'faker';
+import faker from 'faker';
 import { Authentication, AuthenticationParams } from '@/domain/usecases/account/authentication';
 import { AddAccount, AddAccountParams } from '@/domain/usecases/account/addAccount';
 import { AccountModel, AuthenticationModel } from '@/domain/models';
 import { mockAccountModel } from '@/domain/test';
 import { LoadAccountByToken } from '@/domain/usecases/account/loadAccountByToken';
+import { SendLinkConfirmAccount, SendLinkConfirmAccountParams } from '@/domain/usecases/account/sendLinkConfirmAccount';
 
 export class AddAccountSpy implements AddAccount {
   accountModel = mockAccountModel();
@@ -42,5 +43,14 @@ export class LoadAccountByTokenSpy implements LoadAccountByToken {
     this.accessToken = accessToken;
     this.role = role;
     return this.accountModel;
+  }
+}
+
+export class SendLinkConfirmAccountSpy implements SendLinkConfirmAccount {
+  sendLinkConfirmAccountParams: SendLinkConfirmAccountParams;
+
+  sendMail(data: SendLinkConfirmAccountParams): Promise<void> {
+    this.sendLinkConfirmAccountParams = data;
+    return Promise.resolve(undefined);
   }
 }

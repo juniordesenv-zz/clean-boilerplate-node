@@ -1,6 +1,7 @@
 export type AccountModel = {
-  id: string,
-  name: string,
-  email: string,
-  password: string
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  confirmToken?: string;
 };

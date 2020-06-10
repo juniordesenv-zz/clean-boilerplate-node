@@ -2,9 +2,7 @@ import { throwError } from '@/domain/test';
 import nodemailer from 'nodemailer';
 import { NodemailerAdapter } from '@/infra/mailer/nodemailer-adapter/nodemailer-adapter';
 import { MailerParams } from '@/data/protocols/mailer/sender-mail';
-
-let user;
-let pass;
+import faker from 'faker';
 
 const mockMailer = (): MailerParams => ({
   from: 'valid_email@mail.com.br',
@@ -15,32 +13,36 @@ const mockMailer = (): MailerParams => ({
 });
 
 const makeSut = (): NodemailerAdapter => new NodemailerAdapter(
-  user,
-  pass,
-  'smtp.ethereal.email',
+  'any_user',
+  'any_pass',
+  'smtp.any.email',
   587,
   false,
 );
 
-describe('Nodemailer Adapter', () => {
-  beforeEach(async () => {
-    const testAccount = await nodemailer.createTestAccount();
-    user = testAccount.user;
-    pass = testAccount.pass;
-  });
+jest.mock('nodemailer', () => ({
+  createTransport() {
+    return {
+      sendMail: jest.fn(() => ({
+        messageId: faker.random.uuid(),
+      })),
+    };
+  },
+}));
 
+describe('Nodemailer Adapter', () => {
   describe('sendMail()', async () => {
     test('Should sendMail call createTransport with correct values', async () => {
       const sut = makeSut();
       const createTransportSpy = jest.spyOn(nodemailer, 'createTransport');
       await sut.sendMail(mockMailer());
       expect(createTransportSpy).toHaveBeenCalledWith({
-        host: 'smtp.ethereal.email',
+        host: 'smtp.any.email',
         port: 587,
         secure: false,
         auth: {
-          user,
-          pass,
+          user: 'any_user',
+          pass: 'any_pass',
         },
       });
     });
@@ -58,7 +60,6 @@ describe('Nodemailer Adapter', () => {
     test('Should return SentMessageInfo on success', async () => {
       const sut = makeSut();
       const result = await sut.sendMail(mockMailer());
-      expect(result.accepted).toEqual(['other_email@mail.com.br']);
       expect(result.messageId).toBeTruthy();
     });
 

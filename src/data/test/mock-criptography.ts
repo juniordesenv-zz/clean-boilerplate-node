@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import * as faker from 'faker';
+import faker from 'faker';
 import { Hasher } from '@/data/protocols/cryptography/hasher';
 import { Decrypter } from '@/data/protocols/cryptography/decrypter';
 import { Encrypter } from '@/data/protocols/cryptography/encrypter';
