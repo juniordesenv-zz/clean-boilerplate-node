@@ -5,8 +5,8 @@ import schemas from './schemas';
 export default {
   openapi: '3.0.0',
   info: {
-    title: '4Dev - Enquetes para Programadores',
-    description: 'API de ente',
+    title: 'Boilerplate - CleanArch/DDD',
+    description: 'API Boilerplate',
     version: '1.0.0',
   },
   servers: [{
@@ -14,11 +14,8 @@ export default {
     description: 'Servidor Principal',
   }],
   tags: [{
-    name: 'Login',
-    description: 'APIs relacionadas a Login',
-  }, {
-    name: 'Enquete',
-    description: 'APIs relacionadas a Enquete',
+    name: 'Autenticação',
+    description: 'APIs relacionadas a Autenticação',
   }],
   paths,
   schemas,

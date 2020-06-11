@@ -4,3 +4,4 @@ coverage
 .idea
 data
 !src/data
+.env

@@ -1,4 +1,5 @@
 export type AuthenticationModel = {
-  accessToken: string
-  name: string
+  accessToken: string;
+  name: string;
+  confirmedEmail: boolean;
 };

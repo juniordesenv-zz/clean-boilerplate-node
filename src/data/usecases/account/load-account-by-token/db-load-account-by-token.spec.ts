@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import faker from 'faker';
 import { DbLoadAccountByToken } from '@/data/usecases/account/load-account-by-token/db-load-account-by-token';
 import { throwError } from '@/domain/test';
 import { DecrypterSpy, LoadAccountByTokenRepositorySpy } from '@/data/test';

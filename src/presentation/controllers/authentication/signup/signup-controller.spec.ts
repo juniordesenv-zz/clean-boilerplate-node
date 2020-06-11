@@ -1,5 +1,5 @@
 
-import * as faker from 'faker';
+import faker from 'faker';
 import {
   badRequest, serverError, ok, forbidden,
 } from '@/presentation/helpers/http/http-helper';
@@ -8,8 +8,11 @@ import {
 } from '@/presentation/protocols';
 import { EmailInUseError, MissingParamError, ServerError } from '@/presentation/errors';
 import { throwError } from '@/domain/test';
-import { AddAccountSpy, AuthenticationSpy, ValidationSpy } from '@/presentation/test';
+import {
+  AddAccountSpy, SendLinkConfirmAccountSpy, ValidationSpy,
+} from '@/presentation/test';
 import { SignUpController } from '@/presentation/controllers/authentication/signup/signup-controller';
+import env from '@/main/config/env';
 
 const mockRequest = (): HttpRequest => {
   const password = faker.internet.password();
@@ -24,22 +27,27 @@ const mockRequest = (): HttpRequest => {
 };
 
 type SutTypes = {
-  sut: SignUpController
-  addAccountSpy: AddAccountSpy
-  validationSpy: ValidationSpy
-  authenticationSpy: AuthenticationSpy
+  sut: SignUpController;
+  addAccountSpy: AddAccountSpy;
+  validationSpy: ValidationSpy;
+  sendLinkConfirmAccountSpy: SendLinkConfirmAccountSpy;
 };
 
 const makeSut = (): SutTypes => {
-  const authenticationSpy = new AuthenticationSpy();
   const addAccountSpy = new AddAccountSpy();
   const validationSpy = new ValidationSpy();
-  const sut = new SignUpController(addAccountSpy, validationSpy, authenticationSpy);
+  const sendLinkConfirmAccountSpy = new SendLinkConfirmAccountSpy();
+  const sut = new SignUpController(
+    addAccountSpy,
+    validationSpy,
+    sendLinkConfirmAccountSpy,
+    env.baseUrlFront,
+  );
   return {
     sut,
     addAccountSpy,
     validationSpy,
-    authenticationSpy,
+    sendLinkConfirmAccountSpy,
   };
 };
 
@@ -59,6 +67,7 @@ describe('SignUp Controller', () => {
       name: httpRequest.body.name,
       email: httpRequest.body.email,
       password: httpRequest.body.password,
+      confirmedEmail: false,
     });
   });
 
@@ -70,9 +79,9 @@ describe('SignUp Controller', () => {
   });
 
   test('Should return 200 if valid data is provided', async () => {
-    const { sut, authenticationSpy } = makeSut();
+    const { sut } = makeSut();
     const httpResponse = await sut.handle(mockRequest());
-    expect(httpResponse).toEqual(ok(authenticationSpy.authenticationModel));
+    expect(httpResponse).toEqual(ok('Usuário cadastrado com sucesso, confirme seu email'));
   });
 
   test('Should call Validation with correct value', async () => {
@@ -89,20 +98,23 @@ describe('SignUp Controller', () => {
     expect(httpResponse).toEqual(badRequest(validationSpy.error));
   });
 
-  test('Should call Authentication with correct values', async () => {
-    const { sut, authenticationSpy } = makeSut();
+
+  test('Should call SendLinkConfirmAccount with correct values', async () => {
+    const { sut, sendLinkConfirmAccountSpy, addAccountSpy } = makeSut();
     const httpRequest = mockRequest();
     await sut.handle(httpRequest);
-    expect(authenticationSpy.authenticationParams).toEqual({
+    expect(sendLinkConfirmAccountSpy.sendLinkConfirmAccountParams).toEqual({
+      name: httpRequest.body.name,
       email: httpRequest.body.email,
-      password: httpRequest.body.password,
+      confirmEmailToken: addAccountSpy.accountModel.confirmEmailToken,
+      baseUrlFront: env.baseUrlFront,
     });
   });
 
-  test('Should return 500 if Authentication throws', async () => {
-    const { sut, authenticationSpy } = makeSut();
-    jest.spyOn(authenticationSpy, 'auth').mockImplementationOnce(throwError);
+  test('Should return 500 if SendLinkConfirmAccount throws', async () => {
+    const { sut, sendLinkConfirmAccountSpy } = makeSut();
+    jest.spyOn(sendLinkConfirmAccountSpy, 'sendMail').mockImplementationOnce(throwError);
     const httpResponse = await sut.handle(mockRequest());
-    expect(httpResponse).toEqual(serverError(new Error()));
+    expect(httpResponse).toEqual(serverError(new ServerError(null)));
   });
 });

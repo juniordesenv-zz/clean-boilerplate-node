@@ -4,6 +4,17 @@ import { Collection } from 'mongodb';
 import { hash } from 'bcrypt';
 import app from '@/main/config/app';
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper';
+import faker from 'faker';
+
+jest.mock('nodemailer', () => ({
+  createTransport() {
+    return {
+      sendMail: jest.fn(() => ({
+        messageId: faker.random.uuid(),
+      })),
+    };
+  },
+}));
 
 let accountCollection: Collection;
 
@@ -44,6 +55,7 @@ describe('Authentication Routes', () => {
         name: 'Junior Miranda',
         email: 'jr.miranda@outlook.com',
         password,
+        confirmedEmail: true,
       });
       await request(app)
         .post('/api/login')
@@ -55,6 +67,22 @@ describe('Authentication Routes', () => {
     });
 
 
+    test('Should return 403 on login', async () => {
+      const password = await hash('123456', 12);
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password,
+      });
+      await request(app)
+        .post('/api/login')
+        .send({
+          email: 'jr.miranda@outlook.com',
+          password: '123456',
+        })
+        .expect(403);
+    });
+
     test('Should return 401 on login', async () => {
       await request(app)
         .post('/api/login')
@@ -63,6 +91,37 @@ describe('Authentication Routes', () => {
           password: '123456',
         })
         .expect(401);
+    });
+  });
+
+  describe('PUT /confirm-email/:confirmEmailToken', () => {
+    test('Should return 200 on confirm email', async () => {
+      const confirmEmailToken = faker.random.uuid();
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password: '123456',
+        confirmedEmail: false,
+        confirmEmailToken,
+      });
+      await request(app)
+        .put(`/api/confirm-email/${confirmEmailToken}`)
+        .expect(200);
+    });
+
+
+    test('Should return 400 on confirm email', async () => {
+      const confirmEmailToken = faker.random.uuid();
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password: '123456',
+        confirmedEmail: false,
+        confirmEmailToken,
+      });
+      await request(app)
+        .put(`/api/confirm-email/${faker.random.uuid()}`)
+        .expect(400);
     });
   });
 });

@@ -1,11 +1,11 @@
-import * as faker from 'faker';
+import faker from 'faker';
 import {
   HttpRequest,
 } from '@/presentation/protocols';
-import { MissingParamError } from '@/presentation/errors';
+import { EmailIsNotConfirmedError, MissingParamError } from '@/presentation/errors';
 import { LoginController } from '@/presentation/controllers/authentication/login/login-controller';
 import {
-  badRequest, ok, serverError, unauthorized,
+  badRequest, forbidden, ok, serverError, unauthorized,
 } from '@/presentation/helpers/http/http-helper';
 import { mockAuthenticationParams, throwError } from '@/domain/test';
 import { AuthenticationSpy, ValidationSpy } from '@/presentation/test';
@@ -40,6 +40,13 @@ describe('Login Controller', () => {
       email: httpRequest.body.email,
       password: httpRequest.body.password,
     });
+  });
+
+  test('Should return 403 if email is not confirmed', async () => {
+    const { sut, authenticationSpy } = makeSut();
+    authenticationSpy.authenticationModel.confirmedEmail = false;
+    const httpResponse = await sut.handle(mockRequest());
+    expect(httpResponse).toEqual(forbidden(new EmailIsNotConfirmedError()));
   });
 
   test('Should return 401 if invalid credentials are provided', async () => {

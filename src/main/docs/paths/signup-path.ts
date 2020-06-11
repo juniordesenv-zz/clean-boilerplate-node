@@ -1,6 +1,6 @@
 export const signUpPath = {
   post: {
-    tags: ['Login'],
+    tags: ['Autenticação'],
     summary: 'API para criar conta de um usuário',
     description: 'Essa rota pode ser executada por **qualquer usuário**',
     requestBody: {
@@ -17,9 +17,10 @@ export const signUpPath = {
       200: {
         description: 'Sucesso',
         content: {
-          'application/json': {
+          'text/plain': {
             schema: {
-              $ref: '#/schemas/account',
+              type: 'string',
+              example: 'Usuário cadastrado com sucesso, confirme seu email',
             },
           },
         },
