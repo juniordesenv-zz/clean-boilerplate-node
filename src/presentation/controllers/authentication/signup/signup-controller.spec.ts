@@ -106,7 +106,7 @@ describe('SignUp Controller', () => {
     expect(sendLinkConfirmAccountSpy.sendLinkConfirmAccountParams).toEqual({
       name: httpRequest.body.name,
       email: httpRequest.body.email,
-      confirmToken: addAccountSpy.accountModel.confirmToken,
+      confirmEmailToken: addAccountSpy.accountModel.confirmEmailToken,
       baseUrlFront: env.baseUrlFront,
     });
   });

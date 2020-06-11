@@ -32,7 +32,7 @@ const makeSut = (): NodemailerAdapter => new NodemailerAdapter(
 
 
 describe('Nodemailer Adapter', () => {
-  describe('sendMail()', async () => {
+  describe('sendMail()', () => {
     test('Should sendMail call createTransport with correct values', async () => {
       const sut = makeSut();
       const createTransportSpy = jest.spyOn(nodemailer, 'createTransport');

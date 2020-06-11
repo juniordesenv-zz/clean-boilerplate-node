@@ -6,8 +6,8 @@ import { EmailInUseError } from '@/presentation/errors';
 import {
   Controller, HttpRequest, HttpResponse, Validation,
 } from '@/presentation/protocols';
-import { AddAccount } from '@/domain/usecases/account/addAccount';
-import { SendLinkConfirmAccount } from '@/domain/usecases/account/sendLinkConfirmAccount';
+import { AddAccount } from '@/domain/usecases/account/add-account';
+import { SendLinkConfirmAccount } from '@/domain/usecases/account/send-link-confirm-account';
 
 export class SignUpController implements Controller {
   constructor(
@@ -34,7 +34,7 @@ export class SignUpController implements Controller {
       await this.sendLinkConfirmAccount.sendMail({
         name,
         email,
-        confirmToken: account.confirmToken,
+        confirmEmailToken: account.confirmEmailToken,
         baseUrlFront: this.baseUrlFront,
       });
       return ok('Usuário cadastrado com sucesso, confirme seu email');

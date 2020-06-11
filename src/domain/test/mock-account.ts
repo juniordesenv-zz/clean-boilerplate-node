@@ -1,8 +1,8 @@
 import faker from 'faker';
 import { AccountModel } from '@/domain/models';
-import { AddAccountParams } from '@/domain/usecases/account/addAccount';
+import { AddAccountParams } from '@/domain/usecases/account/add-account';
 import { AuthenticationParams } from '@/domain/usecases/account/authentication';
-import { SendLinkConfirmAccountParams } from '@/domain/usecases/account/sendLinkConfirmAccount';
+import { SendLinkConfirmAccountParams } from '@/domain/usecases/account/send-link-confirm-account';
 
 export const mockAddAccountParams = (): AddAccountParams => ({
   name: faker.name.findName(),
@@ -27,6 +27,6 @@ export const mockAuthenticationParams = (): AuthenticationParams => ({
 export const mockSendLinkConfirmAccountParams = (): SendLinkConfirmAccountParams => ({
   name: faker.name.findName(),
   email: faker.internet.email(),
-  confirmToken: faker.random.uuid(),
+  confirmEmailToken: faker.random.uuid(),
   baseUrlFront: faker.internet.url(),
 });

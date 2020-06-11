@@ -1,11 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { AddAccountRepository } from '@/data/protocols/db/account/add-account-repository';
-import { AddAccountParams } from '@/domain/usecases/account/addAccount';
+import { AddAccountParams } from '@/domain/usecases/account/add-account';
 import { AccountModel } from '@/domain/models';
 import { mockAccountModel } from '@/domain/test';
 import { LoadAccountByEmailRepository } from '@/data/protocols/db/account/load-account-by-email-repository';
 import { LoadAccountByTokenRepository } from '@/data/protocols/db/account/load-account-by-token-repository';
 import { UpdateAccessTokenRepository } from '@/data/protocols/db/account/update-access-token-repository';
+import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
 
 export class AddAccountRepositorySpy implements AddAccountRepository {
   accountModel = mockAccountModel();
@@ -51,5 +52,17 @@ export class UpdateAccessTokenRepositorySpy implements UpdateAccessTokenReposito
   async updateAccessToken(id: string, token: string): Promise<void> {
     this.id = id;
     this.token = token;
+  }
+}
+
+export class ConfirmEmailAccountByConfirmTokenRepositorySpy
+implements ConfirmEmailAccountByConfirmTokenRepository {
+  confirmed: boolean = true;
+
+  confirmEmailToken: string;
+
+  async confirmEmailByConfirmToken(confirmEmailToken: string): Promise<boolean> {
+    this.confirmEmailToken = confirmEmailToken;
+    return this.confirmed;
   }
 }

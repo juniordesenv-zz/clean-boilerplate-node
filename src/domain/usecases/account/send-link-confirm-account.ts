@@ -1,7 +1,7 @@
 export type SendLinkConfirmAccountParams = {
   name: string;
   email: string;
-  confirmToken: string;
+  confirmEmailToken: string;
   baseUrlFront: string;
 };
 

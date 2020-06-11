@@ -152,4 +152,42 @@ describe('Account Mongo Repository', () => {
       expect(account).toBeFalsy();
     });
   });
+
+  describe('confirmEmailByConfirmToken()', () => {
+    let name = faker.name.findName();
+    let email = faker.internet.email();
+    let password = faker.internet.password();
+    let confirmEmailToken = faker.random.uuid();
+
+    beforeEach(() => {
+      name = faker.name.findName();
+      email = faker.internet.email();
+      password = faker.internet.password();
+      confirmEmailToken = faker.random.uuid();
+    });
+
+    test('Should return true if confirmEmailByConfirmToken find and update confirmedEmail is true', async () => {
+      const sut = makeSut();
+      await accountCollection.insertOne({
+        name,
+        email,
+        password,
+        confirmEmailToken,
+      });
+      const isConfrimed = await sut.confirmEmailByConfirmToken(confirmEmailToken);
+      expect(isConfrimed).toBe(true);
+    });
+
+    test('Should return false if confirmEmailByConfirmToken is called with confirmEmailToken equals null', async () => {
+      const sut = makeSut();
+      const isConfrimed = await sut.confirmEmailByConfirmToken(null);
+      expect(isConfrimed).toBe(false);
+    });
+
+    test('Should return false if confirmEmailByConfirmToken fails', async () => {
+      const sut = makeSut();
+      const isConfrimed = await sut.confirmEmailByConfirmToken(confirmEmailToken);
+      expect(isConfrimed).toBe(false);
+    });
+  });
 });

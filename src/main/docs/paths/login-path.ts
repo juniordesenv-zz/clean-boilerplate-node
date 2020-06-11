@@ -1,6 +1,6 @@
 export const loginPath = {
   post: {
-    tags: ['Login'],
+    tags: ['Autenticação'],
     summary: 'API para autenticar usuário',
     description: 'Essa rota pode ser executada por **qualquer usuário**',
     requestBody: {

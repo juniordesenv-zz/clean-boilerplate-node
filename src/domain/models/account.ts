@@ -3,6 +3,6 @@ export type AccountModel = {
   name: string;
   email: string;
   password: string;
-  confirmToken?: string;
+  confirmEmailToken?: string;
   confirmedEmail: boolean;
 };

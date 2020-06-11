@@ -93,4 +93,35 @@ describe('Authentication Routes', () => {
         .expect(401);
     });
   });
+
+  describe('PUT /confirm-email/:confirmEmailToken', () => {
+    test('Should return 200 on confirm email', async () => {
+      const confirmEmailToken = faker.random.uuid();
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password: '123456',
+        confirmedEmail: false,
+        confirmEmailToken,
+      });
+      await request(app)
+        .put(`/api/confirm-email/${confirmEmailToken}`)
+        .expect(200);
+    });
+
+
+    test('Should return 400 on confirm email', async () => {
+      const confirmEmailToken = faker.random.uuid();
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password: '123456',
+        confirmedEmail: false,
+        confirmEmailToken,
+      });
+      await request(app)
+        .put(`/api/confirm-email/${faker.random.uuid()}`)
+        .expect(400);
+    });
+  });
 });

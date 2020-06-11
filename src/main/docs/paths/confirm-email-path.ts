@@ -1,18 +1,17 @@
-export const signUpPath = {
-  post: {
+export const confirmEmailPath = {
+  put: {
     tags: ['Autenticação'],
-    summary: 'API para criar conta de um usuário',
-    description: 'Essa rota pode ser executada por **qualquer usuário**',
-    requestBody: {
+    summary: 'API para confirmar o email do usuaŕio',
+    description: 'Essa rota depende do confirmEmailToken encaminhado para o email do usuário',
+    parameters: [{
+      in: 'path',
+      name: 'confirmEmailToken',
+      description: 'Token de confirmação do email',
       required: true,
-      content: {
-        'application/json': {
-          schema: {
-            $ref: '#/schemas/signUpParams',
-          },
-        },
+      schema: {
+        type: 'string',
       },
-    },
+    }],
     responses: {
       200: {
         description: 'Sucesso',
@@ -20,16 +19,13 @@ export const signUpPath = {
           'text/plain': {
             schema: {
               type: 'string',
-              example: 'Usuário cadastrado com sucesso, confirme seu email',
+              example: 'Email confirmado com succeso',
             },
           },
         },
       },
       400: {
         $ref: '#/components/badRequest',
-      },
-      403: {
-        $ref: '#/components/forbidden',
       },
       404: {
         $ref: '#/components/notFound',
