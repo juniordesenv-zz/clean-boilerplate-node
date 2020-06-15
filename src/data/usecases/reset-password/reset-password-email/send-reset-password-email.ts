@@ -6,7 +6,6 @@ import {
   SendLinkResetPasswordParams,
 } from '@/domain/usecases/reset-password/send-link-reset-password';
 
-
 export class SendResetPasswordEmail implements SendLinkResetPassword {
   constructor(
     private readonly templateBuilder: TemplateBuilder,
