@@ -9,6 +9,7 @@ export const mockAddAccountParams = (): AddAccountParams => ({
   email: faker.internet.email(),
   password: faker.internet.password(),
   confirmedEmail: true,
+  createdAt: new Date(),
 });
 
 export const mockAccountModel = (): AccountModel => ({
@@ -17,6 +18,7 @@ export const mockAccountModel = (): AccountModel => ({
   email: faker.internet.email(),
   password: faker.internet.password(),
   confirmedEmail: true,
+  createdAt: new Date(),
 });
 
 export const mockAuthenticationParams = (): AuthenticationParams => ({

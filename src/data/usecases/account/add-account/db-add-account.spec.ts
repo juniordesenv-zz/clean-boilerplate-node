@@ -48,7 +48,7 @@ describe('DbAddAccount Usecase', () => {
     const { sut, hasherSpy } = makeSut();
     jest.spyOn(hasherSpy, 'hash').mockImplementationOnce(throwError);
     const promise = sut.add(mockAddAccountParams());
-    expect(promise).rejects.toThrow();
+    await expect(promise).rejects.toThrow();
   });
 
   test('Should call AddAccountRepository with correct values', async () => {
@@ -66,6 +66,7 @@ describe('DbAddAccount Usecase', () => {
       password: hasherSpy.digest,
       confirmEmailToken: uuidSpy.uuid,
       confirmedEmail: addAccountParams.confirmedEmail,
+      createdAt: addAccountParams.createdAt,
     });
   });
 

@@ -1,5 +1,6 @@
 
 import faker from 'faker';
+import MockDate from 'mockdate';
 import {
   badRequest, serverError, ok, forbidden,
 } from '@/presentation/helpers/http/http-helper';
@@ -52,6 +53,14 @@ const makeSut = (): SutTypes => {
 };
 
 describe('SignUp Controller', () => {
+  beforeAll(() => {
+    MockDate.set(new Date());
+  });
+
+  afterAll(() => {
+    MockDate.reset();
+  });
+
   test('Should return 500 if AddAccount throws', async () => {
     const { sut, addAccountSpy } = makeSut();
     jest.spyOn(addAccountSpy, 'add').mockImplementationOnce(throwError);
@@ -68,6 +77,7 @@ describe('SignUp Controller', () => {
       email: httpRequest.body.email,
       password: httpRequest.body.password,
       confirmedEmail: false,
+      createdAt: new Date(),
     });
   });
 

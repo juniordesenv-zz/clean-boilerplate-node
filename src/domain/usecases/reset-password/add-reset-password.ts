@@ -1,7 +1,14 @@
 import { ResetPasswordModel } from '@/domain/models/reset-password';
+import { AccountModel } from '@/domain/models';
 
-export type AddResetPasswordParams = Omit<ResetPasswordModel, 'id'>;
+export type AddResetPasswordParams = Omit<ResetPasswordModel, 'id'|'accountId'> & {
+  email: string;
+};
 
-export interface AddResetPasswordModel {
-  add (resetPassword: AddResetPasswordParams): Promise<ResetPasswordModel>
+export type AddResetPasswordResult = ResetPasswordModel & {
+  account: AccountModel;
+};
+
+export interface AddResetPassword {
+  add (resetPassword: AddResetPasswordParams): Promise<AddResetPasswordResult>
 }
