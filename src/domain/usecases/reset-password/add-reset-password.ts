@@ -1,8 +1,9 @@
 import { ResetPasswordModel } from '@/domain/models/reset-password';
 import { AccountModel } from '@/domain/models';
 
-export type AddResetPasswordParams = Omit<ResetPasswordModel, 'id'|'accountId'> & {
+export type AddResetPasswordParams = {
   email: string;
+  createdAt: Date;
 };
 
 export type AddResetPasswordResult = ResetPasswordModel & {

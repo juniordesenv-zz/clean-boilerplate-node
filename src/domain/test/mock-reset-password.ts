@@ -1,13 +1,11 @@
 import faker from 'faker';
-import { AddResetPasswordParams } from '@/domain/usecases/reset-password/add-reset-password';
+import { AddResetPasswordParams, AddResetPasswordResult } from '@/domain/usecases/reset-password/add-reset-password';
 import { ResetPasswordModel } from '@/domain/models/reset-password';
 import { SendLinkResetPasswordParams } from '@/domain/usecases/reset-password/send-link-reset-password';
+import { mockAccountModel } from '@/domain/test/mock-account';
 
 export const mockAddResetPasswordParams = (): AddResetPasswordParams => ({
   email: faker.internet.email(),
-  token: faker.random.uuid(),
-  isEnabled: true,
-  expiredAt: faker.date.future(),
   createdAt: faker.date.past(),
 });
 
@@ -25,4 +23,14 @@ export const mockSendLinkResetPasswordParams = (): SendLinkResetPasswordParams =
   email: faker.internet.email(),
   token: faker.random.uuid(),
   baseUrlFront: faker.internet.url(),
+});
+
+export const mockResetPasswordResult = (): AddResetPasswordResult => ({
+  id: faker.random.uuid(),
+  accountId: faker.random.uuid(),
+  token: faker.random.uuid(),
+  isEnabled: true,
+  expiredAt: faker.date.future(),
+  createdAt: faker.date.past(),
+  account: mockAccountModel(),
 });

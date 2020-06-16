@@ -1,28 +1,36 @@
 import {
-  AddResetPasswordRepositorySpy,
-  LoadAccountByEmailRepositorySpy,
+  AddResetPasswordRepositorySpy, DateSpy,
+  LoadAccountByEmailRepositorySpy, UuidSpy,
 } from '@/data/test';
 import { mockAddResetPasswordParams } from '@/domain/test/mock-reset-password';
-import { throwError } from '@/domain/test';
-import { DbAddResetPassword } from '@/data/usecases/reset-password/add-reset-password/db-add-reset-password';
+import { mockAddAccountParams, throwError } from '@/domain/test';
+import { DbAddResetPassword } from '@/data/usecases/reset-password/add-reset-password/db-add-reset-password-t';
 
 type SutTypes = {
   sut: DbAddResetPassword;
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy;
   addResetPasswordRepositorySpy: AddResetPasswordRepositorySpy;
+  uuidSpy: UuidSpy;
+  dateSpy: DateSpy;
 };
 
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositorySpy = new LoadAccountByEmailRepositorySpy();
   const addResetPasswordRepositorySpy = new AddResetPasswordRepositorySpy();
+  const uuidSpy = new UuidSpy();
+  const dateSpy = new DateSpy();
   const sut = new DbAddResetPassword(
     loadAccountByEmailRepositorySpy,
     addResetPasswordRepositorySpy,
+    uuidSpy,
+    dateSpy,
   );
   return {
     sut,
     loadAccountByEmailRepositorySpy,
     addResetPasswordRepositorySpy,
+    uuidSpy,
+    dateSpy,
   };
 };
 
@@ -52,12 +60,17 @@ describe('DbAddResetPassword Usecase', () => {
 
 
   test('Should call AddResetPasswordRepository with correct values', async () => {
-    const { sut, addResetPasswordRepositorySpy, loadAccountByEmailRepositorySpy } = makeSut();
+    const {
+      sut, addResetPasswordRepositorySpy, loadAccountByEmailRepositorySpy, uuidSpy, dateSpy,
+    } = makeSut();
     const addResetPasswordParams = mockAddResetPasswordParams();
     await sut.add(addResetPasswordParams);
     expect(addResetPasswordRepositorySpy.addResetPasswordParams).toEqual({
       ...addResetPasswordParams,
       accountId: loadAccountByEmailRepositorySpy.accountModel.id,
+      isEnabled: true,
+      expiredAt: dateSpy.futureDate,
+      token: uuidSpy.uuid,
     });
   });
 
@@ -70,5 +83,32 @@ describe('DbAddResetPassword Usecase', () => {
       ...addResetPasswordRepositorySpy.resetPasswordModel,
       account: loadAccountByEmailRepositorySpy.accountModel,
     });
+  });
+
+  test('Should call Uuid v4', async () => {
+    const { sut, uuidSpy } = makeSut();
+    await sut.add(mockAddResetPasswordParams());
+    expect(uuidSpy.callsCount).toBe(1);
+  });
+
+  test('Should throw if Uuid throws', async () => {
+    const { sut, uuidSpy } = makeSut();
+    jest.spyOn(uuidSpy, 'v4').mockImplementationOnce(throwError);
+    const promise = sut.add(mockAddAccountParams());
+    await expect(promise).rejects.toThrow();
+  });
+
+  test('Should call IncrementDate add', async () => {
+    const { sut, dateSpy } = makeSut();
+    await sut.add(mockAddResetPasswordParams());
+    expect(dateSpy.callsCount).toBe(1);
+  });
+
+
+  test('Should throw if IncrementDate throws', async () => {
+    const { sut, dateSpy } = makeSut();
+    jest.spyOn(dateSpy, 'add').mockImplementationOnce(throwError);
+    const promise = sut.add(mockAddAccountParams());
+    await expect(promise).rejects.toThrow();
   });
 });

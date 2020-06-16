@@ -5,3 +5,4 @@ export * from './unauthorized-error';
 export * from './missing-param-error';
 export * from './server-error';
 export * from './email-is-not-confirmed-error';
+export * from './email-not-found-error';

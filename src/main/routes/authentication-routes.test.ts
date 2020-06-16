@@ -124,4 +124,40 @@ describe('Authentication Routes', () => {
         .expect(400);
     });
   });
+
+
+  describe('POST /reset-password', () => {
+    test('Should return 200 on reset password', async () => {
+      const password = await hash('123456', 12);
+      await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password,
+        confirmedEmail: true,
+      });
+      await request(app)
+        .post('/api/reset-password')
+        .send({
+          email: 'jr.miranda@outlook.com',
+        })
+        .expect(200);
+    });
+
+    test('Should return 400 on reset password', async () => {
+      await request(app)
+        .post('/api/reset-password')
+        .send({
+          email: 'not_found@email.com',
+        })
+        .expect(403);
+    });
+
+    test('Should return 400 on reset password', async () => {
+      await request(app)
+        .post('/api/reset-password')
+        .send({
+        })
+        .expect(400);
+    });
+  });
 });
