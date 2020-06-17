@@ -10,6 +10,8 @@ import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db
 import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
 import faker from 'faker';
 import { ChangePasswordAccountById } from '@/domain/usecases/account/change-password-account-by-id';
+import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
+import { LoadAccountById } from '@/domain/usecases/account/load-account-by-id';
 
 export class AddAccountRepositorySpy implements AddAccountRepository {
   accountModel = mockAccountModel();
@@ -95,5 +97,28 @@ export class ChangePasswordAccountByIdSpy implements ChangePasswordAccountById {
     this.accountId = accountId;
     this.password = password;
     return this.changed;
+  }
+}
+
+
+export class LoadAccountByIdRepositorySpy implements LoadAccountByIdRepository {
+  accountModel = mockAccountModel();
+
+  id: string;
+
+  async loadById(id: string): Promise<AccountModel> {
+    this.id = id;
+    return this.accountModel;
+  }
+}
+
+export class LoadAccountByIdSpy implements LoadAccountById {
+  accountModel = mockAccountModel();
+
+  accountId: string;
+
+  async load(accountId: string): Promise<AccountModel> {
+    this.accountId = accountId;
+    return this.accountModel;
   }
 }

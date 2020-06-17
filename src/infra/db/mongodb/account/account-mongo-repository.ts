@@ -7,12 +7,14 @@ import { AddAccountRepository } from '@/data/protocols/db/account/add-account-re
 import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
 import { FindAndModifyWriteOpResultObject } from 'mongodb';
 import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
+import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
 
 export class AccountMongoRepository implements AddAccountRepository,
             LoadAccountByEmailRepository,
             UpdateAccessTokenRepository,
             ConfirmEmailAccountByConfirmTokenRepository,
-  ChangePasswordAccountByIdRepository {
+            ChangePasswordAccountByIdRepository,
+            LoadAccountByIdRepository {
   async add(accountData: AddAccountParams): Promise<AccountModel> {
     const accountCollection = await MongoHelper.getCollection('accounts');
     const result = await accountCollection.insertOne(accountData);
@@ -80,5 +82,13 @@ export class AccountMongoRepository implements AddAccountRepository,
         returnOriginal: false,
       });
     return !!value;
+  }
+
+  async loadById(accountId: string): Promise<AccountModel> {
+    const accountCollection = await MongoHelper.getCollection('accounts');
+    const account = await accountCollection.findOne({
+      _id: accountId,
+    });
+    return account && MongoHelper.map(account);
   }
 }
