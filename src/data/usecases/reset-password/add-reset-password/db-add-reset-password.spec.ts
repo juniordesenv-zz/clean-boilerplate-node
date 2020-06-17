@@ -1,15 +1,16 @@
 import {
-  AddResetPasswordRepositorySpy, DateSpy,
+  AddResetPasswordRepositorySpy, DateSpy, DisableAllResetPasswordByAccountRepositorySpy,
   LoadAccountByEmailRepositorySpy, UuidSpy,
 } from '@/data/test';
 import { mockAddResetPasswordParams } from '@/domain/test/mock-reset-password';
 import { mockAddAccountParams, throwError } from '@/domain/test';
-import { DbAddResetPassword } from '@/data/usecases/reset-password/add-reset-password/db-add-reset-password-t';
+import { DbAddResetPassword } from '@/data/usecases/reset-password/add-reset-password/db-add-reset-password';
 
 type SutTypes = {
   sut: DbAddResetPassword;
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy;
   addResetPasswordRepositorySpy: AddResetPasswordRepositorySpy;
+  disableAllResetPasswordByAccountRepositorySpy: DisableAllResetPasswordByAccountRepositorySpy;
   uuidSpy: UuidSpy;
   dateSpy: DateSpy;
 };
@@ -17,11 +18,14 @@ type SutTypes = {
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositorySpy = new LoadAccountByEmailRepositorySpy();
   const addResetPasswordRepositorySpy = new AddResetPasswordRepositorySpy();
+  const disableAllResetPasswordByAccountRepositorySpy = new
+  DisableAllResetPasswordByAccountRepositorySpy();
   const uuidSpy = new UuidSpy();
   const dateSpy = new DateSpy();
   const sut = new DbAddResetPassword(
     loadAccountByEmailRepositorySpy,
     addResetPasswordRepositorySpy,
+    disableAllResetPasswordByAccountRepositorySpy,
     uuidSpy,
     dateSpy,
   );
@@ -29,6 +33,7 @@ const makeSut = (): SutTypes => {
     sut,
     loadAccountByEmailRepositorySpy,
     addResetPasswordRepositorySpy,
+    disableAllResetPasswordByAccountRepositorySpy,
     uuidSpy,
     dateSpy,
   };
@@ -104,10 +109,24 @@ describe('DbAddResetPassword Usecase', () => {
     expect(dateSpy.callsCount).toBe(1);
   });
 
-
   test('Should throw if IncrementDate throws', async () => {
     const { sut, dateSpy } = makeSut();
     jest.spyOn(dateSpy, 'add').mockImplementationOnce(throwError);
+    const promise = sut.add(mockAddAccountParams());
+    await expect(promise).rejects.toThrow();
+  });
+
+
+  test('Should call DisableAllResetPasswordByAccountRepository add', async () => {
+    const { sut, disableAllResetPasswordByAccountRepositorySpy } = makeSut();
+    await sut.add(mockAddResetPasswordParams());
+    expect(disableAllResetPasswordByAccountRepositorySpy.callsCount).toBe(1);
+  });
+
+
+  test('Should throw if DisableAllResetPasswordByAccountRepository throws', async () => {
+    const { sut, disableAllResetPasswordByAccountRepositorySpy } = makeSut();
+    jest.spyOn(disableAllResetPasswordByAccountRepositorySpy, 'disableAllByAccount').mockImplementationOnce(throwError);
     const promise = sut.add(mockAddAccountParams());
     await expect(promise).rejects.toThrow();
   });

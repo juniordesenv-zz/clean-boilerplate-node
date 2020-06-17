@@ -3,6 +3,7 @@ import { AddResetPasswordParams, AddResetPasswordResult } from '@/domain/usecase
 import { ResetPasswordModel } from '@/domain/models/reset-password';
 import { SendLinkResetPasswordParams } from '@/domain/usecases/reset-password/send-link-reset-password';
 import { mockAccountModel } from '@/domain/test/mock-account';
+import { ApplyResetPasswordParams } from '@/domain/usecases/reset-password/apply-reset-password';
 
 export const mockAddResetPasswordParams = (): AddResetPasswordParams => ({
   email: faker.internet.email(),
@@ -33,4 +34,10 @@ export const mockResetPasswordResult = (): AddResetPasswordResult => ({
   expiredAt: faker.date.future(),
   createdAt: faker.date.past(),
   account: mockAccountModel(),
+});
+
+
+export const mockApplyResetPasswordParams = (): ApplyResetPasswordParams => ({
+  password: faker.internet.password(),
+  token: faker.random.uuid(),
 });

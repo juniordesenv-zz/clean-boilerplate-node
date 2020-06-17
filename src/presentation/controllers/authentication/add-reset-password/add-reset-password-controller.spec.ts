@@ -15,8 +15,8 @@ import {
   SendLinkResetPasswordSpy,
 } from '@/presentation/test';
 import env from '@/main/config/env';
+import { AddResetPasswordController } from '@/presentation/controllers/authentication/add-reset-password/add-reset-password-controller';
 
-import { ResetPasswordController } from '@/presentation/controllers/authentication/reset-password/reset-password-controller';
 
 const mockRequest = (): HttpRequest => ({
   body: {
@@ -25,7 +25,7 @@ const mockRequest = (): HttpRequest => ({
 });
 
 type SutTypes = {
-  sut: ResetPasswordController;
+  sut: AddResetPasswordController;
   addResetPasswordSpy: AddResetPasswordSpy;
   validationSpy: ValidationSpy;
   sendLinkResetPasswordSpy: SendLinkResetPasswordSpy;
@@ -35,7 +35,7 @@ const makeSut = (): SutTypes => {
   const addResetPasswordSpy = new AddResetPasswordSpy();
   const validationSpy = new ValidationSpy();
   const sendLinkResetPasswordSpy = new SendLinkResetPasswordSpy();
-  const sut = new ResetPasswordController(
+  const sut = new AddResetPasswordController(
     addResetPasswordSpy,
     validationSpy,
     sendLinkResetPasswordSpy,
@@ -49,7 +49,7 @@ const makeSut = (): SutTypes => {
   };
 };
 
-describe('ResetPassword Controller', () => {
+describe('AddResetPassword Controller', () => {
   beforeAll(() => {
     MockDate.set(new Date());
   });

@@ -9,7 +9,7 @@ import {
 import { SendLinkResetPassword } from '@/domain/usecases/reset-password/send-link-reset-password';
 import { AddResetPassword } from '@/domain/usecases/reset-password/add-reset-password';
 
-export class ResetPasswordController implements Controller {
+export class AddResetPasswordController implements Controller {
   constructor(
     private readonly addResetPassword: AddResetPassword,
     private readonly validation: Validation,

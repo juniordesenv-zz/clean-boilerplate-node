@@ -5,6 +5,7 @@ import {
   AddResetPasswordResult,
 } from '@/domain/usecases/reset-password/add-reset-password';
 import { AddResetPasswordRepository } from '@/data/protocols/db/reset-password/add-reset-password-repository';
+import { DisableAllResetPasswordByAccountRepository } from '@/data/protocols/db/reset-password/disable-all-reset-password-by-account-repository';
 import { UuidV4 } from '@/data/protocols/uuid/uuid-v4';
 import { IncrementDate } from '@/data/protocols/date/increment-date';
 
@@ -12,6 +13,8 @@ export class DbAddResetPassword implements AddResetPassword {
   constructor(
     private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
     private readonly addResetPasswordRepository: AddResetPasswordRepository,
+    private readonly disableAllResetPasswordByAccountRepository:
+    DisableAllResetPasswordByAccountRepository,
     private readonly uuid: UuidV4,
     private readonly incrementDate: IncrementDate,
   ) {
@@ -25,6 +28,8 @@ export class DbAddResetPassword implements AddResetPassword {
     const expiredAt = this.incrementDate.add(new Date(), {
       hours: 8,
     });
+    await this.disableAllResetPasswordByAccountRepository
+      .disableAllByAccount(account.id);
     const resetPassword = await this.addResetPasswordRepository.add({
       ...resetPasswordParams,
       accountId: account.id,

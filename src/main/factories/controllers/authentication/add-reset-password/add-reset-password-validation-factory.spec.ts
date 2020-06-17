@@ -3,7 +3,7 @@ import {
 } from '@/validation/validators';
 import { Validation } from '@/presentation/protocols/validation';
 import { EmailValidator } from '@/validation/protocols/email-validator';
-import { makeResetPasswordValidation } from '@/main/factories/controllers/authentication/reset-password/reset-password-validation-factory';
+import { makeAddResetPasswordValidation } from '@/main/factories/controllers/authentication/add-reset-password/add-reset-password-validation-factory';
 
 jest.mock('@/validation/validators/validation-composite');
 
@@ -19,7 +19,7 @@ const makeEmailValidator = (): EmailValidator => {
 
 describe('SignUpValidation Factory', () => {
   test('Should call ValidationComposite with all validatations', () => {
-    makeResetPasswordValidation();
+    makeAddResetPasswordValidation();
     const validations: Validation[] = [];
     for (const field of ['email']) {
       validations.push(new RequiredFieldValidation(field));

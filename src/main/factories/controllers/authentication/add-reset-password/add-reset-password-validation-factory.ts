@@ -6,7 +6,7 @@ import {
 import { Validation } from '@/presentation/protocols/validation';
 import { EmailValidatorAdapter } from '@/infra/validators/email-validator-adapter';
 
-export const makeResetPasswordValidation = (): ValidationComposite => {
+export const makeAddResetPasswordValidation = (): ValidationComposite => {
   const validations: Validation[] = [];
   for (const field of ['email']) {
     validations.push(new RequiredFieldValidation(field));

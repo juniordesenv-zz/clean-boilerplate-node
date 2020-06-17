@@ -17,6 +17,7 @@ jest.mock('nodemailer', () => ({
 }));
 
 let accountCollection: Collection;
+let resetPasswordCollection: Collection;
 
 describe('Authentication Routes', () => {
   beforeAll(async () => {
@@ -30,8 +31,9 @@ describe('Authentication Routes', () => {
   beforeEach(async () => {
     accountCollection = await MongoHelper.getCollection('accounts');
     await accountCollection.deleteMany({});
+    resetPasswordCollection = await MongoHelper.getCollection('resetPasswords');
+    await resetPasswordCollection.deleteMany({});
   });
-
 
   describe('POST /signup', () => {
     test('Should return 200 on signup', async () => {
@@ -46,7 +48,6 @@ describe('Authentication Routes', () => {
         .expect(200);
     });
   });
-
 
   describe('POST /login', () => {
     test('Should return 200 on login', async () => {
@@ -125,7 +126,6 @@ describe('Authentication Routes', () => {
     });
   });
 
-
   describe('POST /reset-password', () => {
     test('Should return 200 on reset password', async () => {
       const password = await hash('123456', 12);
@@ -156,6 +156,57 @@ describe('Authentication Routes', () => {
       await request(app)
         .post('/api/reset-password')
         .send({
+        })
+        .expect(400);
+    });
+  });
+
+
+  describe('PUT /reset-password/:token', () => {
+    test('Should return 200 on reset password', async () => {
+      const password = await hash('123456', 12);
+      const token = faker.random.uuid();
+      const account = await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password,
+        confirmedEmail: true,
+      });
+      await resetPasswordCollection.insertOne({
+        expiredAt: faker.date.future(),
+        accountId: account.ops[0]._id,
+        isEnabled: true,
+        token,
+      });
+      await request(app)
+        .put(`/api/reset-password/${token}`)
+        .send({
+          password: '123456789',
+          passwordConfirmation: '123456789',
+        })
+        .expect(200);
+    });
+
+    test('Should return 400 on reset password', async () => {
+      const password = await hash('123456', 12);
+      const token = faker.random.uuid();
+      const account = await accountCollection.insertOne({
+        name: 'Junior Miranda',
+        email: 'jr.miranda@outlook.com',
+        password,
+        confirmedEmail: true,
+      });
+      await resetPasswordCollection.insertOne({
+        expiredAt: faker.date.future(),
+        accountId: account.ops[0]._id,
+        isEnabled: true,
+        token: 'any_token',
+      });
+      await request(app)
+        .put(`/api/reset-password/${token}`)
+        .send({
+          password: '123456789',
+          passwordConfirmation: '123456789',
         })
         .expect(400);
     });
