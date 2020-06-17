@@ -7,6 +7,9 @@ import { LoadAccountByEmailRepository } from '@/data/protocols/db/account/load-a
 import { LoadAccountByTokenRepository } from '@/data/protocols/db/account/load-account-by-token-repository';
 import { UpdateAccessTokenRepository } from '@/data/protocols/db/account/update-access-token-repository';
 import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
+import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
+import faker from 'faker';
+import { ChangePasswordAccountById } from '@/domain/usecases/account/change-password-account-by-id';
 
 export class AddAccountRepositorySpy implements AddAccountRepository {
   accountModel = mockAccountModel();
@@ -64,5 +67,33 @@ implements ConfirmEmailAccountByConfirmTokenRepository {
   async confirmEmailByConfirmToken(confirmEmailToken: string): Promise<boolean> {
     this.confirmEmailToken = confirmEmailToken;
     return this.confirmed;
+  }
+}
+
+export class ChangePasswordAccountByIdRepositorySpy implements ChangePasswordAccountByIdRepository {
+  accountId = faker.random.uuid();
+
+  hashedPassword = faker.internet.password();
+
+  changed: boolean = true;
+
+  async changePasswordById(accountId: string, hashedPassword: string): Promise<boolean> {
+    this.accountId = accountId;
+    this.hashedPassword = hashedPassword;
+    return this.changed;
+  }
+}
+
+export class ChangePasswordAccountByIdSpy implements ChangePasswordAccountById {
+  accountId: string;
+
+  password: string;
+
+  changed: boolean = true;
+
+  async change(accountId: string, password: string): Promise<boolean> {
+    this.accountId = accountId;
+    this.password = password;
+    return this.changed;
   }
 }

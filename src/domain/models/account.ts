@@ -5,4 +5,5 @@ export type AccountModel = {
   password: string;
   confirmEmailToken?: string;
   confirmedEmail: boolean;
+  createdAt: Date;
 };

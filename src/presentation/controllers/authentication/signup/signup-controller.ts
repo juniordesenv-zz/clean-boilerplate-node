@@ -29,6 +29,7 @@ export class SignUpController implements Controller {
         email,
         password,
         confirmedEmail: false,
+        createdAt: new Date(),
       });
       if (!account) return forbidden(new EmailInUseError());
       await this.sendLinkConfirmAccount.sendMail({

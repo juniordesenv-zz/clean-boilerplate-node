@@ -15,7 +15,7 @@ export class SendEmailConfirmAccount implements SendLinkConfirmAccount {
   async sendMail(data: SendLinkConfirmAccountParams): Promise<void> {
     const html = await this.templateBuilder.build({
       name: data.name,
-      confirmLink: `${data.baseUrlFront}/api/confirm-email/${data.confirmEmailToken}`,
+      confirmLink: `${data.baseUrlFront}/confirm-email/${data.confirmEmailToken}`,
     });
     await this.senderMail.sendMail({
       from: this.fromEmail,

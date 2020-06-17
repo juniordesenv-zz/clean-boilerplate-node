@@ -190,4 +190,33 @@ describe('Account Mongo Repository', () => {
       expect(isConfrimed).toBe(false);
     });
   });
+
+  describe('changePasswordById()', () => {
+    test('Should update the account password on changePasswordById success', async () => {
+      const sut = makeSut();
+      const res = await accountCollection.insertOne(mockAddAccountParams());
+      const fakeAccount = res.ops[0];
+      const password = faker.internet.password();
+      await sut.changePasswordById(fakeAccount._id, password);
+      const account = await accountCollection.findOne({ _id: fakeAccount._id });
+      expect(account).toBeTruthy();
+      expect(account.password).toBe(password);
+    });
+
+    test('Should return true on changePasswordById on success', async () => {
+      const sut = makeSut();
+      const res = await accountCollection.insertOne(mockAddAccountParams());
+      const fakeAccount = res.ops[0];
+      const password = faker.internet.password();
+      const result = await sut.changePasswordById(fakeAccount._id, password);
+      expect(result).toBe(true);
+    });
+
+    test('Should return false on changePasswordById on id not found', async () => {
+      const sut = makeSut();
+      const password = faker.internet.password();
+      const result = await sut.changePasswordById('wrong_id', password);
+      expect(result).toBe(false);
+    });
+  });
 });

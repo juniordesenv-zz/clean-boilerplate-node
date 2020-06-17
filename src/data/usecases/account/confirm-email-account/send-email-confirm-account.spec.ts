@@ -44,7 +44,7 @@ describe('SendEmailConfirmAccount Usecase', () => {
     await sut.sendMail(sendLinkConfirmAccountParams);
     expect(templateBuilderSpy.transpileData).toEqual({
       name: sendLinkConfirmAccountParams.name,
-      confirmLink: `${sendLinkConfirmAccountParams.baseUrlFront}/api/confirm-email/${sendLinkConfirmAccountParams.confirmEmailToken}`,
+      confirmLink: `${sendLinkConfirmAccountParams.baseUrlFront}/confirm-email/${sendLinkConfirmAccountParams.confirmEmailToken}`,
     });
   });
 
