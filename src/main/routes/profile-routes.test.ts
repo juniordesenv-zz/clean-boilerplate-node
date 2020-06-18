@@ -79,4 +79,24 @@ describe('Profile Routes', () => {
         .expect(200);
     });
   });
+  describe('PUT /profile/password', () => {
+    test('Should return 403  without accessToken', async () => {
+      await request(app)
+        .put('/api/profile/password')
+        .expect(403);
+    });
+
+    test('Should return 200 on profile', async () => {
+      const accessToken = await mockAccessToken();
+      const password = faker.internet.password();
+      await request(app)
+        .put('/api/profile/password')
+        .set('authorization', accessToken)
+        .send({
+          password,
+          passwordConfirmation: password,
+        })
+        .expect(200);
+    });
+  });
 });

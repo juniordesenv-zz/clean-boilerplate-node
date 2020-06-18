@@ -9,7 +9,6 @@ import { UpdateAccessTokenRepository } from '@/data/protocols/db/account/update-
 import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
 import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
 import faker from 'faker';
-import { ChangePasswordAccountById } from '@/domain/usecases/account/change-password-account-by-id';
 import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
 import { UpdateProfileRepository } from '@/data/protocols/db/account/update-profile-repository';
 import { UpdateProfileParams } from '@/domain/usecases/profile/update-profile';
@@ -86,21 +85,6 @@ export class ChangePasswordAccountByIdRepositorySpy implements ChangePasswordAcc
     return this.changed;
   }
 }
-
-export class ChangePasswordAccountByIdSpy implements ChangePasswordAccountById {
-  accountId: string;
-
-  password: string;
-
-  changed: boolean = true;
-
-  async change(accountId: string, password: string): Promise<boolean> {
-    this.accountId = accountId;
-    this.password = password;
-    return this.changed;
-  }
-}
-
 
 export class LoadAccountByIdRepositorySpy implements LoadAccountByIdRepository {
   accountModel = mockAccountModel();
