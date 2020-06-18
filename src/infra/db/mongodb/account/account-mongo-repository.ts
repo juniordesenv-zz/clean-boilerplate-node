@@ -5,16 +5,20 @@ import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper';
 import { AccountModel } from '@/domain/models';
 import { AddAccountRepository } from '@/data/protocols/db/account/add-account-repository';
 import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
-import { FindAndModifyWriteOpResultObject } from 'mongodb';
+import { FindAndModifyWriteOpResultObject, ObjectId } from 'mongodb';
 import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
 import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
+import { UpdateProfileRepository } from '@/data/protocols/db/account/update-profile-repository';
+import { UpdateProfileParams } from '@/domain/usecases/profile/update-profile';
+
 
 export class AccountMongoRepository implements AddAccountRepository,
             LoadAccountByEmailRepository,
             UpdateAccessTokenRepository,
             ConfirmEmailAccountByConfirmTokenRepository,
             ChangePasswordAccountByIdRepository,
-            LoadAccountByIdRepository {
+            LoadAccountByIdRepository,
+            UpdateProfileRepository {
   async add(accountData: AddAccountParams): Promise<AccountModel> {
     const accountCollection = await MongoHelper.getCollection('accounts');
     const result = await accountCollection.insertOne(accountData);
@@ -28,10 +32,10 @@ export class AccountMongoRepository implements AddAccountRepository,
     return account && MongoHelper.map(account);
   }
 
-  async updateAccessToken(id: string, token: string): Promise<void> {
+  async updateAccessToken(accountId: string, token: string): Promise<void> {
     const accountCollection = await MongoHelper.getCollection('accounts');
     await accountCollection.updateOne({
-      _id: id,
+      _id: new ObjectId(accountId),
     }, {
       $set: {
         accessToken: token,
@@ -73,7 +77,7 @@ export class AccountMongoRepository implements AddAccountRepository,
     const accountCollection = await MongoHelper.getCollection('accounts');
     const { value }: FindAndModifyWriteOpResultObject<AccountModel> = await accountCollection
       .findOneAndUpdate({
-        _id: accountId,
+        _id: new ObjectId(accountId),
       }, {
         $set: {
           password: hashedPassword,
@@ -87,8 +91,22 @@ export class AccountMongoRepository implements AddAccountRepository,
   async loadById(accountId: string): Promise<AccountModel> {
     const accountCollection = await MongoHelper.getCollection('accounts');
     const account = await accountCollection.findOne({
-      _id: accountId,
+      _id: new ObjectId(accountId),
     });
     return account && MongoHelper.map(account);
+  }
+
+  async updateProfile(accountId: string,
+    updateProfileData: UpdateProfileParams): Promise<AccountModel> {
+    const accountCollection = await MongoHelper.getCollection('accounts');
+    const { value }: FindAndModifyWriteOpResultObject<AccountModel> = await accountCollection
+      .findOneAndUpdate({
+        _id: new ObjectId(accountId),
+      }, {
+        $set: updateProfileData,
+      }, {
+        returnOriginal: false,
+      });
+    return value || null;
   }
 }

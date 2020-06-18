@@ -10,7 +10,7 @@
     "debug": "nodemon -r dotenv/config -L --watch ./dist --inspect=0.0.0.0:9222 --nolazy ./dist/main/server.js",
     "down": "docker-compose down",
     "test": "jest --silent --noStackTrace --runInBand",
-    "test:verbose": "jest -c jest-unit-config.js",
+    "test:verbose": "jest -c jest-integration-config.js",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:e2e": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",

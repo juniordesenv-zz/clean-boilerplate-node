@@ -1,4 +1,5 @@
 import request from 'supertest';
+import faker from 'faker';
 import { Collection } from 'mongodb';
 
 import app from '@/main/config/app';
@@ -11,8 +12,8 @@ let accountCollection: Collection;
 
 const mockAccessToken = async (): Promise<string> => {
   const res = await accountCollection.insertOne({
-    name: 'Rodrigo',
-    email: 'rodrigo.manguinho@gmail.com',
+    name: faker.name.findName(),
+    email: faker.internet.email(),
     password: '123',
     role: 'admin',
   });
@@ -55,6 +56,26 @@ describe('Profile Routes', () => {
       await request(app)
         .get('/api/profile')
         .set('authorization', accessToken)
+        .expect(200);
+    });
+  });
+
+  describe('PUT /profile', () => {
+    test('Should return 403  without accessToken', async () => {
+      await request(app)
+        .put('/api/profile')
+        .expect(403);
+    });
+
+    test('Should return 200 on profile', async () => {
+      const accessToken = await mockAccessToken();
+      await request(app)
+        .put('/api/profile')
+        .set('authorization', accessToken)
+        .send({
+          name: faker.name.findName(),
+          email: faker.internet.email(),
+        })
         .expect(200);
     });
   });

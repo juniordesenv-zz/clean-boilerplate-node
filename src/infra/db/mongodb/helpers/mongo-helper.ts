@@ -25,7 +25,7 @@ export const MongoHelper = {
   map(collection: any): any {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { _id, ...collectionWithoutId } = collection;
-    return { ...collectionWithoutId, id: _id };
+    return { ...collectionWithoutId, id: _id.toString() };
   },
 
   mapList(collection: any[]): any[] {

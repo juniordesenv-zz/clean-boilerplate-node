@@ -11,7 +11,8 @@ import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account
 import faker from 'faker';
 import { ChangePasswordAccountById } from '@/domain/usecases/account/change-password-account-by-id';
 import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
-import { LoadAccountById } from '@/domain/usecases/account/load-account-by-id';
+import { UpdateProfileRepository } from '@/data/protocols/db/account/update-profile-repository';
+import { UpdateProfileParams } from '@/domain/usecases/profile/update-profile';
 
 export class AddAccountRepositorySpy implements AddAccountRepository {
   accountModel = mockAccountModel();
@@ -112,13 +113,18 @@ export class LoadAccountByIdRepositorySpy implements LoadAccountByIdRepository {
   }
 }
 
-export class LoadAccountByIdSpy implements LoadAccountById {
+
+export class UpdateProfileRepositorySpy implements UpdateProfileRepository {
   accountModel = mockAccountModel();
 
   accountId: string;
 
-  async load(accountId: string): Promise<AccountModel> {
+  updateProfileData: UpdateProfileParams;
+
+  async updateProfile(accountId: string,
+    updateProfileData: UpdateProfileParams): Promise<AccountModel> {
     this.accountId = accountId;
+    this.updateProfileData = updateProfileData;
     return this.accountModel;
   }
 }
