@@ -3,6 +3,8 @@ import {
   signUpPath,
   confirmEmailPath,
   resetPasswordPath,
+  profilePath,
+  profilePasswordPath,
 } from './paths/';
 
 export default {
@@ -15,4 +17,6 @@ export default {
   '/reset-password/{token}': {
     put: resetPasswordPath.put,
   },
+  '/profile': profilePath,
+  '/profile/password': profilePasswordPath,
 };

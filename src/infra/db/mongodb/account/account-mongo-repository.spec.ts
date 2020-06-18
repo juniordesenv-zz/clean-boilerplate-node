@@ -1,4 +1,4 @@
-import { Collection } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import faker from 'faker';
 import { AccountMongoRepository } from '@/infra/db/mongodb/account/account-mongo-repository';
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper';
@@ -215,8 +215,73 @@ describe('Account Mongo Repository', () => {
     test('Should return false on changePasswordById on id not found', async () => {
       const sut = makeSut();
       const password = faker.internet.password();
-      const result = await sut.changePasswordById('wrong_id', password);
+      const result = await sut.changePasswordById(new ObjectId().toString(), password);
       expect(result).toBe(false);
+    });
+  });
+
+  describe('loadById()', () => {
+    let name = faker.name.findName();
+    let email = faker.internet.email();
+    let password = faker.internet.password();
+    let accessToken = faker.random.uuid();
+
+    beforeEach(() => {
+      name = faker.name.findName();
+      email = faker.internet.email();
+      password = faker.internet.password();
+      accessToken = faker.random.uuid();
+    });
+
+    test('Should return an account on loadById', async () => {
+      const sut = makeSut();
+      const result = await accountCollection.insertOne({
+        name,
+        email,
+        password,
+        accessToken,
+      });
+      const account = await sut.loadById(result.ops[0]._id);
+      expect(account).toBeTruthy();
+      expect(account.id).toBeTruthy();
+      expect(account.name).toBe(name);
+      expect(account.email).toBe(email);
+      expect(account.password).toBe(password);
+    });
+
+    test('Should return null if loadById fails', async () => {
+      const sut = makeSut();
+      const account = await sut.loadById(new ObjectId().toString());
+      expect(account).toBeFalsy();
+    });
+  });
+
+  describe('updateProfile', () => {
+    test('Should update the account profile on updateProfile success and return account', async () => {
+      const sut = makeSut();
+      const res = await accountCollection.insertOne(mockAddAccountParams());
+      const fakeAccount = res.ops[0];
+      const name = faker.random.uuid();
+      const email = faker.internet.email();
+      const account = await sut.updateProfile(fakeAccount._id, {
+        name,
+        email,
+      });
+      expect(account).toBeTruthy();
+      expect(account.name).toBe(name);
+      expect(account.email).toBe(email);
+    });
+
+
+    test('Should return null if not found account', async () => {
+      const sut = makeSut();
+      const name = faker.random.uuid();
+      const email = faker.internet.email();
+      const account = await sut.updateProfile(new ObjectId().toString(), {
+        name,
+        email,
+      });
+      expect(account).toBe(null);
     });
   });
 });

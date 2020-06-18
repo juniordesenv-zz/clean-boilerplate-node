@@ -1,6 +1,6 @@
 import {
-  ChangePasswordAccountByIdSpy,
-  DisableAllResetPasswordByAccountRepositorySpy,
+  ChangePasswordAccountByIdRepositorySpy,
+  DisableAllResetPasswordByAccountRepositorySpy, HasherSpy,
   LoadResetPasswordByTokenNotExpiredRepositorySpy,
 } from '@/data/test';
 import { mockApplyResetPasswordParams } from '@/domain/test/mock-reset-password';
@@ -9,11 +9,12 @@ import { DbApplyResetPassword } from '@/data/usecases/reset-password/apply-reset
 
 type SutTypes = {
   sut: DbApplyResetPassword;
+  hasherSpy: HasherSpy;
   loadResetPasswordByTokenNotExpiredRepositorySpy:
   LoadResetPasswordByTokenNotExpiredRepositorySpy;
   disableAllResetPasswordByAccountRepositorySpy: DisableAllResetPasswordByAccountRepositorySpy;
-  changePasswordAccountByIdSpy:
-  ChangePasswordAccountByIdSpy;
+  changePasswordAccountByIdRepositorySpy:
+  ChangePasswordAccountByIdRepositorySpy;
 };
 
 const makeSut = (): SutTypes => {
@@ -21,18 +22,21 @@ const makeSut = (): SutTypes => {
   LoadResetPasswordByTokenNotExpiredRepositorySpy();
   const disableAllResetPasswordByAccountRepositorySpy = new
   DisableAllResetPasswordByAccountRepositorySpy();
-  const changePasswordAccountByIdSpy = new
-  ChangePasswordAccountByIdSpy();
+  const changePasswordAccountByIdRepositorySpy = new
+  ChangePasswordAccountByIdRepositorySpy();
+  const hasherSpy = new HasherSpy();
   const sut = new DbApplyResetPassword(
+    hasherSpy,
     loadResetPasswordByTokenNotExpiredRepositorySpy,
     disableAllResetPasswordByAccountRepositorySpy,
-    changePasswordAccountByIdSpy,
+    changePasswordAccountByIdRepositorySpy,
   );
   return {
     sut,
+    hasherSpy,
     loadResetPasswordByTokenNotExpiredRepositorySpy,
     disableAllResetPasswordByAccountRepositorySpy,
-    changePasswordAccountByIdSpy,
+    changePasswordAccountByIdRepositorySpy,
   };
 };
 
@@ -61,34 +65,39 @@ describe('DbApplyResetPassword Usecase', () => {
   });
 
 
-  test('Should call ChangePasswordAccountById with correct id and password', async () => {
+  test('Should call Hasher with correct password', async () => {
+    const { sut, hasherSpy } = makeSut();
+    const applyResetPasswordParams = mockApplyResetPasswordParams();
+    await sut.apply(applyResetPasswordParams);
+    expect(hasherSpy.plaintext).toBe(applyResetPasswordParams.password);
+  });
+
+  test('Should throw if Hasher throws', async () => {
+    const { sut, hasherSpy } = makeSut();
+    jest.spyOn(hasherSpy, 'hash').mockImplementationOnce(throwError);
+    const promise = sut.apply(mockApplyResetPasswordParams());
+    await expect(promise).rejects.toThrow();
+  });
+
+  test('Should call ChangePasswordAccountByIdRepository with correct values', async () => {
     const {
       sut,
-      changePasswordAccountByIdSpy,
+      changePasswordAccountByIdRepositorySpy,
       loadResetPasswordByTokenNotExpiredRepositorySpy,
+      hasherSpy,
     } = makeSut();
     const applyResetPasswordParams = mockApplyResetPasswordParams();
     await sut.apply(applyResetPasswordParams);
-    expect(changePasswordAccountByIdSpy.accountId)
+    expect(changePasswordAccountByIdRepositorySpy.accountId)
       .toBe(loadResetPasswordByTokenNotExpiredRepositorySpy.resetPasswordModel.accountId);
-    expect(changePasswordAccountByIdSpy.password)
-      .toBe(applyResetPasswordParams.password);
+    expect(changePasswordAccountByIdRepositorySpy.hashedPassword).toBe(hasherSpy.digest);
   });
 
-
-  test('Should return false if ChangePasswordAccountById on fails', async () => {
-    const { sut, changePasswordAccountByIdSpy } = makeSut();
-    changePasswordAccountByIdSpy.changed = false;
-    const result = await sut.apply(mockApplyResetPasswordParams());
-    expect(result).toBe(false);
-  });
-
-
-  test('Should throw if ChangePasswordAccountById throws', async () => {
-    const { sut, changePasswordAccountByIdSpy } = makeSut();
-    jest.spyOn(changePasswordAccountByIdSpy, 'change').mockImplementationOnce(throwError);
-    const promise = sut.apply(mockApplyResetPasswordParams());
-    await expect(promise).rejects.toThrow();
+  test('Should return false if ChangePasswordAccountByIdRepository returns false', async () => {
+    const { sut, changePasswordAccountByIdRepositorySpy } = makeSut();
+    changePasswordAccountByIdRepositorySpy.changed = false;
+    const isConfirmed = await sut.apply(mockApplyResetPasswordParams());
+    expect(isConfirmed).toBe(false);
   });
 
 
@@ -108,9 +117,9 @@ describe('DbApplyResetPassword Usecase', () => {
     const {
       sut,
       disableAllResetPasswordByAccountRepositorySpy,
-      changePasswordAccountByIdSpy,
+      changePasswordAccountByIdRepositorySpy,
     } = makeSut();
-    changePasswordAccountByIdSpy.changed = false;
+    changePasswordAccountByIdRepositorySpy.changed = false;
     await sut.apply(mockApplyResetPasswordParams());
     expect(disableAllResetPasswordByAccountRepositorySpy.callsCount).toBe(0);
   });

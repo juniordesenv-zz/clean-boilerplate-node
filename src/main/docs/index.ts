@@ -13,10 +13,16 @@ export default {
     url: '/api',
     description: 'Servidor Principal',
   }],
-  tags: [{
-    name: 'Autenticação',
-    description: 'APIs relacionadas a Autenticação',
-  }],
+  tags: [
+    {
+      name: 'Autenticação',
+      description: 'APIs relacionadas a Autenticação',
+    },
+    {
+      name: 'Perfil',
+      description: 'APIs relacionadas ao perfil',
+    },
+  ],
   paths,
   schemas,
   components,

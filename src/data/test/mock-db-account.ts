@@ -9,7 +9,9 @@ import { UpdateAccessTokenRepository } from '@/data/protocols/db/account/update-
 import { ConfirmEmailAccountByConfirmTokenRepository } from '@/data/protocols/db/account/confirm-email-account-by-confirm-token-repository';
 import { ChangePasswordAccountByIdRepository } from '@/data/protocols/db/account/change-password-account-by-id-repository';
 import faker from 'faker';
-import { ChangePasswordAccountById } from '@/domain/usecases/account/change-password-account-by-id';
+import { LoadAccountByIdRepository } from '@/data/protocols/db/account/load-account-by-id-repository';
+import { UpdateProfileRepository } from '@/data/protocols/db/account/update-profile-repository';
+import { UpdateProfileParams } from '@/domain/usecases/profile/update-profile';
 
 export class AddAccountRepositorySpy implements AddAccountRepository {
   accountModel = mockAccountModel();
@@ -84,16 +86,29 @@ export class ChangePasswordAccountByIdRepositorySpy implements ChangePasswordAcc
   }
 }
 
-export class ChangePasswordAccountByIdSpy implements ChangePasswordAccountById {
+export class LoadAccountByIdRepositorySpy implements LoadAccountByIdRepository {
+  accountModel = mockAccountModel();
+
+  id: string;
+
+  async loadById(id: string): Promise<AccountModel> {
+    this.id = id;
+    return this.accountModel;
+  }
+}
+
+
+export class UpdateProfileRepositorySpy implements UpdateProfileRepository {
+  accountModel = mockAccountModel();
+
   accountId: string;
 
-  password: string;
+  updateProfileData: UpdateProfileParams;
 
-  changed: boolean = true;
-
-  async change(accountId: string, password: string): Promise<boolean> {
+  async updateProfile(accountId: string,
+    updateProfileData: UpdateProfileParams): Promise<AccountModel> {
     this.accountId = accountId;
-    this.password = password;
-    return this.changed;
+    this.updateProfileData = updateProfileData;
+    return this.accountModel;
   }
 }
