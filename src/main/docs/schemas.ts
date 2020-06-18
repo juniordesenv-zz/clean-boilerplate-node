@@ -5,6 +5,8 @@ import {
   signUpParamsSchema,
   addResetPasswordParamsSchema,
   applyResetPasswordParamsSchema,
+  profileSchema,
+  profilePasswordParamsSchema,
 } from './schemas/';
 
 export default {
@@ -14,4 +16,6 @@ export default {
   error: errorSchema,
   addResetPasswordParams: addResetPasswordParamsSchema,
   applyResetPasswordParams: applyResetPasswordParamsSchema,
+  profile: profileSchema,
+  profilePasswordParams: profilePasswordParamsSchema,
 };
