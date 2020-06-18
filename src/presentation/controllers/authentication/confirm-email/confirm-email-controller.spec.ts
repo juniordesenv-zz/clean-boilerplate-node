@@ -38,7 +38,7 @@ const makeSut = (): SutTypes => {
 };
 
 describe('ConfirmEmail Controller', () => {
-  test('Should return 500 if AddAccount throws', async () => {
+  test('Should return 500 if ConfirmEmailAccountByConfirmEmailToken throws', async () => {
     const { sut, confirmEmailAccountByConfirmEmailTokenSpy } = makeSut();
     jest.spyOn(confirmEmailAccountByConfirmEmailTokenSpy, 'confirmEmail').mockImplementationOnce(throwError);
     const httpResponse = await sut.handle(mockRequest());

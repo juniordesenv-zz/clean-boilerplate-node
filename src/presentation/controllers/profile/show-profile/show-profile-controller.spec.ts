@@ -1,68 +1,67 @@
 
 import faker from 'faker';
 import {
-  badRequest, serverError, ok,
+  serverError, ok, forbidden,
 } from '@/presentation/helpers/http/http-helper';
 import {
   HttpRequest,
 } from '@/presentation/protocols';
 import {
-  InvalidParamError, ServerError,
+  AccessDeniedError,
+  ServerError,
 } from '@/presentation/errors';
 import { throwError } from '@/domain/test';
 import {
-  ConfirmEmailAccountByConfirmEmailTokenSpy,
+  ShowProfileSpy,
 } from '@/presentation/test';
-import { ConfirmEmailController } from '@/presentation/controllers/authentication/confirm-email/confirm-email-controller';
+import { ShowProfileController } from '@/presentation/controllers/profile/show-profile/show-profile-controller';
 
 const mockRequest = (): HttpRequest => ({
-  params: {
-    confirmEmailToken: faker.random.uuid(),
-  },
+  accountId: faker.random.uuid(),
 });
 
 type SutTypes = {
-  sut: ConfirmEmailController;
-  confirmEmailAccountByConfirmEmailTokenSpy: ConfirmEmailAccountByConfirmEmailTokenSpy;
+  sut: ShowProfileController;
+  showProfileSpy: ShowProfileSpy;
 };
 
 const makeSut = (): SutTypes => {
-  const confirmEmailAccountByConfirmEmailTokenSpy = new ConfirmEmailAccountByConfirmEmailTokenSpy();
-  const sut = new ConfirmEmailController(
-    confirmEmailAccountByConfirmEmailTokenSpy,
+  const showProfileSpy = new ShowProfileSpy();
+  const sut = new ShowProfileController(
+    showProfileSpy,
   );
   return {
     sut,
-    confirmEmailAccountByConfirmEmailTokenSpy,
+    showProfileSpy,
   };
 };
 
-describe('ConfirmEmail Controller', () => {
-  test('Should return 500 if AddAccount throws', async () => {
-    const { sut, confirmEmailAccountByConfirmEmailTokenSpy } = makeSut();
-    jest.spyOn(confirmEmailAccountByConfirmEmailTokenSpy, 'confirmEmail').mockImplementationOnce(throwError);
+describe('ShowProfile Controller', () => {
+  test('Should return 500 if ShowProfile throws', async () => {
+    const { sut, showProfileSpy } = makeSut();
+    jest.spyOn(showProfileSpy, 'show').mockImplementationOnce(throwError);
     const httpResponse = await sut.handle(mockRequest());
     expect(httpResponse).toEqual(serverError(new ServerError(null)));
   });
 
-  test('Should call ConfirmEmailAccountByConfirmEmailToken with correct values', async () => {
-    const { sut, confirmEmailAccountByConfirmEmailTokenSpy } = makeSut();
+  test('Should call ShowProfile with correct values', async () => {
+    const { sut, showProfileSpy } = makeSut();
     const httpRequest = mockRequest();
     await sut.handle(httpRequest);
-    expect(confirmEmailAccountByConfirmEmailTokenSpy.confirmEmailToken)
-      .toEqual(httpRequest.params.confirmEmailToken);
+    expect(showProfileSpy.accountId)
+      .toEqual(httpRequest.accountId);
   });
 
-  test('Should return 400 if ConfirmEmailAccountByConfirmEmailToken returns false', async () => {
-    const { sut, confirmEmailAccountByConfirmEmailTokenSpy } = makeSut();
-    confirmEmailAccountByConfirmEmailTokenSpy.isConfirmed = false;
+  test('Should return 403 if ShowProfile returns null', async () => {
+    const { sut, showProfileSpy } = makeSut();
+    showProfileSpy.profileModel = null;
     const httpResponse = await sut.handle(mockRequest());
-    expect(httpResponse).toEqual(badRequest(new InvalidParamError('confirmEmailToken')));
+    expect(httpResponse).toEqual(forbidden(new AccessDeniedError()));
   });
 
-  test('Should return 200 if valid data is provided', async () => {
-    const { sut } = makeSut();
+  test('Should return 200 if valid request', async () => {
+    const { sut, showProfileSpy } = makeSut();
     const httpResponse = await sut.handle(mockRequest());
-    expect(httpResponse).toEqual(ok('Email confirmado com succeso'));
+    expect(httpResponse).toEqual(ok(showProfileSpy.profileModel));
   });
 });

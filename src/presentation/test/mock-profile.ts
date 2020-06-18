@@ -3,6 +3,19 @@ import { UpdateProfile, UpdateProfileParams } from '@/domain/usecases/profile/up
 import { ProfileModel } from '@/domain/models';
 import { mockProfileModel } from '@/domain/test/mock-profile';
 import { UpdatePasswordProfile } from '@/domain/usecases/profile/update-password-profile';
+import { ShowProfile } from '@/domain/usecases/profile/show-profile';
+
+export class ShowProfileSpy
+implements ShowProfile {
+  profileModel: ProfileModel = mockProfileModel();
+
+  accountId: string;
+
+  async show(accountId: string): Promise<ProfileModel> {
+    this.accountId = accountId;
+    return this.profileModel;
+  }
+}
 
 export class UpdateProfileSpy
 implements UpdateProfile {
